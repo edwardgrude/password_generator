@@ -1,4 +1,5 @@
 <?php
+	// php called by ajax
 	if (!empty($_POST)) {
 		$length = isset($_POST['length_param']) ? (int)$_POST['length_param'] : 15;
 
@@ -9,7 +10,7 @@
 
 		$randomString = '';
 
-		// Kleinbuchstaben
+		// Lower case characters
 		$charactersLength = strlen($characters_a);
 		for ($i = 0; $i < $length; $i++) {
 			$randomString .= $characters_a[rand(0, $charactersLength - 1)];
@@ -17,7 +18,7 @@
 
 		$already_replaced = array();
 
-		// 1/3 Großbuchstaben
+		// 1/3 upper case characters
 		$length_third = (int)($length / 3);
 		while (count($already_replaced) < $length_third) {
 			$pos = rand(0, $length - 1);
@@ -27,7 +28,7 @@
 			}
 		}
 
-		// 1/3 Zahlen
+		// 1/3 numbers
 		while (count($already_replaced) < ($length_third * 2)) {
 			$pos = rand(0, $length - 1);
 			if (!in_array($pos, $already_replaced)) {
@@ -36,7 +37,7 @@
 			}
 		}
 
-		// 1/6 Sonderzeichen
+		// 1/6 special characters
 		while (count($already_replaced) < (($length_third * 2) + ($length_third / 2))) {
 			$pos = rand(0, $length - 1);
 			if (!in_array($pos, $already_replaced)) {
@@ -55,98 +56,23 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="styles.css" />
 		<title>Password-Generator</title>
-		<style type='text/css'>
-			html, body {
-				margin:0;
-				padding:0;
-			}
-
-			html {
-				margin:20px;
-			}
-
-			p, a {
-				font-family:verdana,arial,tahoma,sans-serif;
-				font-size:54px;
-				margin:20px;
-				padding:0;
-			}
-
-			a {
-				color:#0086CB;
-				text-decoration:none;
-			}
-
-			a:hover {
-				text-decoration:underline;
-			}
-
-			#random_string {
-				cursor:pointer;
-			}
-
-			#random_string:hover {
-				color:#0086CB
-			}
-
-			.slider {
-				-webkit-appearance: none;  /* Override default CSS styles */
-				appearance: none;
-				width: 550px; /* Full-width */
-				height: 25px; /* Specified height */
-				background: #DDD; /* Grey background */
-				outline: none; /* Remove outline */
-				opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-				-webkit-transition: .2s; /* 0.2 seconds transition on hover */
-				transition: opacity .2s;
-				float:left;
-			}
-
-			.slider:hover {
-				opacity: 1; /* Fully shown on mouse-over */
-			}
-
-			.slider::-webkit-slider-thumb {
-				-webkit-appearance: none; /* Override default look */
-				appearance: none;
-				width: 25px; /* Set a specific slider handle width */
-				height: 25px; /* Slider handle height */
-				background: #0086CB; /* Green background */
-				cursor: pointer; /* Cursor on hover */
-			}
-
-			.slider::-moz-range-thumb {
-				width: 25px; /* Set a specific slider handle width */
-				height: 25px; /* Slider handle height */
-				background: #0086CB; /* Green background */
-				cursor: pointer; /* Cursor on hover */
-			}
-			.slidecontainer p {
-				float:left;
-				font-size:20px;
-				margin:3px 0 0 10px;
-			}
-
-			.warning {
-				background: #EAA;
-			}
-		</style>
 	</head>
 	<body>
 		<p id='random_string' onclick='setClipboardText();'>...</p>
 		<div class="slidecontainer">
-			<input type="range" min="1" max="40" value="<?php echo $length ?>" class="slider" id="myRange"><p><?php echo $length ?></p>
+			<input type="range" min="1" max="40" value="<?php echo $length ?>" class="slider"><p><?php echo $length ?></p>
 			<div style='clear:both;'></div>
 		</div>
-		<p style='font-size:13px;color:#888;line-height:20px;'>Click password to copy to clipboard<br/>and to generate the next password.</p>
+		<p id='description'>Click password to copy to clipboard<br/>and to generate the next password.</p>
 		<script type='text/javascript'>
 			function setClipboardText() {
 				text = document.getElementById('random_string').innerHTML;
 				var id = "mycustom-clipboard-textarea-hidden-id";
 				var existsTextarea = document.getElementById(id);
 
-				if(!existsTextarea){
+				if (!existsTextarea) {
 					console.log("Creating textarea");
 					var textarea = document.createElement("textarea");
 					textarea.id = id;
@@ -173,7 +99,7 @@
 					document.querySelector("body").appendChild(textarea);
 					console.log("The textarea now exists :)");
 					existsTextarea = document.getElementById(id);
-				}else{
+				} else {
 					console.log("The textarea already exists :3")
 				}
 
@@ -182,9 +108,9 @@
 
 				try {
 					var status = document.execCommand('copy');
-					if(!status){
+					if (!status){
 						console.error("Cannot copy text");
-					}else{
+					} else {
 						console.log("The text is now on the clipboard");
 					}
 				} catch (err) {
@@ -194,22 +120,22 @@
 				const length = $('.slider').val();
 				$.ajax({
 					type:'post',
-						url:'password.php',
-						data:'length_param=' + length,
-						success:function(data) {
-							$('#random_string').html(data);
-						}
+					url:'password.php',
+					data:'length_param=' + length,
+					success:function(data) {
+						$('#random_string').html(data);
+					}
 				});
 			}
 
 			$(document).ready(function() {
 				$.ajax({
 					type:'post',
-						url:'password.php',
-						data:'length_param=' + $('.slider').val(),
-						success:function(data) {
-							$('#random_string').html(data);
-						}
+					url:'password.php',
+					data:'length_param=' + $('.slider').val(),
+					success:function(data) {
+						$('#random_string').html(data);
+					}
 				});
 
 				$('.slider').on('input', function(e) {
@@ -221,11 +147,11 @@
 
 					$.ajax({
 						type:'post',
-							url:'password.php',
-							data:'length_param=' + length,
-							success:function(data) {
-								$('#random_string').html(data);
-							}
+						url:'password.php',
+						data:'length_param=' + length,
+						success:function(data) {
+							$('#random_string').html(data);
+						}
 					});
 				});
 			});
